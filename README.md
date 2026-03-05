@@ -1,71 +1,103 @@
-# Dette er vår løsning på Caseoppgave for Start IT 5. mars 2026
+# Start IT – Tripletex Security Control Center
 
-## Project info
+Frontend-løsning for caseoppgave (5. mars 2026) som demonstrerer governance, integrasjoner, sikkerhet og compliance i ett kontrollsenter.
 
-**URL** ikke lenger tilgjenelig
+## Innhold
 
-## How can I edit this code?
+- [Oversikt](#oversikt)
+- [Funksjonalitet](#funksjonalitet)
+- [Teknologistack](#teknologistack)
+- [Komme i gang](#komme-i-gang)
+- [NPM-scripts](#npm-scripts)
+- [Prosjektstruktur](#prosjektstruktur)
+- [Videre arbeid](#videre-arbeid)
 
-There are several ways of editing your application.
+## Oversikt
 
-**Use Lovable**
+Appen er bygget som et dashboard med sidepanel + toppbar og fire hovedmoduler:
 
+- **Governance** – godkjenningsregler, delegering og audit trail
+- **Integrasjoner** – status på tilkoblede systemer
+- **Security & Compliance** – policy-håndheving, avvik og compliance pack
+- **Om oss** – sertifiseringer og tiltak
 
+Målet er å gi en tydelig, visuelt konsistent oversikt over internkontroll og sikkerhetsstatus.
 
-**Use your preferred IDE**
+## Funksjonalitet
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Security & Compliance
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Oversikt over sentrale sikkerhetsmålinger (2FA, SSO, admin-brukere, API-tilganger)
+- Liste over aktive policies med status: **Overholdt / Delvis / Avvik**
+- Opprettelse av ny policy direkte i UI via **Ny policy**-dialog
+- Tiltaksvisning via **Se tiltak** for policies med avvik/delvis overholdelse
+- Tiltak kan markeres som fullført/ikke fullført i dialogen
+- Eksportseksjon for compliance pack (PDF/Excel/ZIP)
 
-Follow these steps:
+### Governance
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Godkjenningsregler med prioritet og template
+- Delegeringer med perioder og status
+- Audit events for sporbarhet
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Integrasjoner / Om oss
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Egen modul per domene for status- og tillitsinformasjon
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## Teknologistack
+
+- **React 18** + **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **shadcn/ui** + Radix UI primitives
+- **TanStack Query**
+- **Vitest** + Testing Library
+
+## Komme i gang
+
+### Krav
+
+- Node.js 18+ (anbefalt LTS)
+- npm
+
+### Lokal oppstart
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Åpne adressen Vite skriver ut i terminalen (vanligvis `http://localhost:5173`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## NPM-scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` – start utviklingsserver
+- `npm run build` – produksjonsbuild
+- `npm run build:dev` – build i development mode
+- `npm run preview` – forhåndsvis produksjonsbuild lokalt
+- `npm run lint` – kjør ESLint
+- `npm run test` – kjør tester én gang
+- `npm run test:watch` – kjør tester i watch mode
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Prosjektstruktur
 
-## What technologies are used for this project?
+```text
+src/
+	components/
+		GovernanceTab.tsx
+		IntegrationsTab.tsx
+		SecurityTab.tsx
+		AboutTab.tsx
+		ui/
+	pages/
+		Index.tsx
+		NotFound.tsx
+	test/
+```
 
-This project is built with:
+## Videre arbeid
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Koble policy-data til backend/API (persistens)
+- Legge til autentisering og rollebasert tilgang
+- Utvide testdekning for interaksjoner i Security-modulen
+- Legge til faktisk eksport/generering av compliance pack
