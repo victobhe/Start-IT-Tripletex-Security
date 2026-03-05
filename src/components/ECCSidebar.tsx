@@ -25,6 +25,12 @@ const tabs = [
     icon: Lock,
     description: "Policy & bevis",
   },
+  {
+    id: "about",
+    label: "Om oss",
+    icon: Info,
+    description: "Sertifiseringer & tiltak",
+  },
 ];
 
 export function ECCSidebar({ activeTab, onTabChange }: SidebarProps) {
