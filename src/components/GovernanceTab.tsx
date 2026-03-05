@@ -1,7 +1,21 @@
 import { useState } from "react";
-import { Plus, ChevronRight, User, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Plus, ChevronRight, User, AlertCircle, CheckCircle2, Clock, Download } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const approvalRules = [
   {
@@ -72,7 +86,40 @@ const selectedInvoice = {
 };
 
 export function GovernanceTab() {
+  const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<"rules" | "delegation" | "audit">("rules");
+  const [ruleDialogOpen, setRuleDialogOpen] = useState(false);
+  const [delegationDialogOpen, setDelegationDialogOpen] = useState(false);
+
+  const handleExport = (format: string) => {
+    toast({
+      title: `Eksporterer til ${format}`,
+      description: `Audit trail for ${selectedInvoice.id} blir eksportert.`,
+    });
+  };
+
+  const handleApplyTemplate = (template: string) => {
+    toast({
+      title: "Template aktivert",
+      description: `${template} er nå aktivert med standard godkjenningsregler.`,
+    });
+  };
+
+  const handleAddRule = () => {
+    toast({
+      title: "Regel opprettet",
+      description: "Ny godkjenningsregel er lagt til.",
+    });
+    setRuleDialogOpen(false);
+  };
+
+  const handleAddDelegation = () => {
+    toast({
+      title: "Delegasjon opprettet",
+      description: "Ny delegasjon er aktivert.",
+    });
+    setDelegationDialogOpen(false);
+  };
 
   return (
     <div className="flex-1 overflow-auto scrollbar-thin p-6 space-y-6 animate-slide-in">
@@ -106,10 +153,40 @@ export function GovernanceTab() {
               <h3 className="text-base font-semibold text-foreground">Godkjenningsregler</h3>
               <p className="text-xs text-muted-foreground">Definer regler basert på beløp, dimensjon og dokumenttype</p>
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-              <Plus className="w-3.5 h-3.5" />
-              Ny regel
-            </button>
+            <Dialog open={ruleDialogOpen} onOpenChange={setRuleDialogOpen}>
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                  Ny regel
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Opprett godkjenningsregel</DialogTitle>
+                  <DialogDescription>
+                    Definer betingelser og godkjennere for automatisk routing
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="rule-condition">Betingelse</Label>
+                    <Input id="rule-condition" placeholder="f.eks. 'Faktura > 50 000 kr'" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="rule-doctype">Dokumenttype</Label>
+                    <Input id="rule-doctype" placeholder="Leverandørfaktura" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="rule-approvers">Godkjennere</Label>
+                    <Textarea id="rule-approvers" placeholder="CFO, Controller" />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setRuleDialogOpen(false)}>Avbryt</Button>
+                  <Button onClick={handleAddRule}>Opprett regel</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="space-y-2">
@@ -145,7 +222,11 @@ export function GovernanceTab() {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Standardmaler</p>
             <div className="grid grid-cols-3 gap-3">
               {["Basic Control", "Enterprise Control", "Regnskapsbyrå-pakke"].map((t) => (
-                <div key={t} className="card-glass rounded-lg p-3 text-center hover:border-primary/30 transition-colors cursor-pointer">
+                <div 
+                  key={t} 
+                  onClick={() => handleApplyTemplate(t)}
+                  className="card-glass rounded-lg p-3 text-center hover:border-primary/30 transition-colors cursor-pointer"
+                >
                   <p className="text-xs font-semibold text-foreground">{t}</p>
                   <p className="text-[10px] text-muted-foreground mt-1">Klikk for å bruke</p>
                 </div>
@@ -163,10 +244,44 @@ export function GovernanceTab() {
               <h3 className="text-base font-semibold text-foreground">Delegering & Eskalering</h3>
               <p className="text-xs text-muted-foreground">Midlertidige delegasjoner og automatiske eskaleringer</p>
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-              <Plus className="w-3.5 h-3.5" />
-              Ny delegasjon
-            </button>
+            <Dialog open={delegationDialogOpen} onOpenChange={setDelegationDialogOpen}>
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                  Ny delegasjon
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Opprett delegasjon</DialogTitle>
+                  <DialogDescription>
+                    Deleger godkjenningsrettigheter midlertidig
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="del-from">Fra</Label>
+                    <Input id="del-from" placeholder="Navn (rolle)" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="del-to">Til</Label>
+                    <Input id="del-to" placeholder="Navn (rolle)" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="del-period">Periode</Label>
+                    <Input id="del-period" placeholder="10.–20. mars 2026" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="del-reason">Årsak</Label>
+                    <Input id="del-reason" placeholder="Ferie, kurs, sykdom" />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setDelegationDialogOpen(false)}>Avbryt</Button>
+                  <Button onClick={handleAddDelegation}>Opprett delegasjon</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="space-y-3">
@@ -211,10 +326,18 @@ export function GovernanceTab() {
               <p className="text-xs text-muted-foreground">Sporbarhet per dokument</p>
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 bg-surface-1 border border-border text-muted-foreground rounded-md text-sm hover:text-foreground transition-colors">
+              <button 
+                onClick={() => handleExport('PDF')}
+                className="px-3 py-1.5 bg-surface-1 border border-border text-muted-foreground rounded-md text-sm hover:text-foreground transition-colors flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
                 Export PDF
               </button>
-              <button className="px-3 py-1.5 bg-surface-1 border border-border text-muted-foreground rounded-md text-sm hover:text-foreground transition-colors">
+              <button 
+                onClick={() => handleExport('CSV')}
+                className="px-3 py-1.5 bg-surface-1 border border-border text-muted-foreground rounded-md text-sm hover:text-foreground transition-colors flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
                 Export CSV
               </button>
             </div>

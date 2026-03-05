@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RefreshCw, AlertTriangle, User, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const integrations = [
   {
@@ -93,9 +94,10 @@ const errorLogs = [
 
 interface IntegrationRowProps {
   integration: (typeof integrations)[0];
+  onViewErrorLog: (name: string) => void;
 }
 
-function IntegrationRow({ integration }: IntegrationRowProps) {
+function IntegrationRow({ integration, onViewErrorLog }: IntegrationRowProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -150,7 +152,12 @@ function IntegrationRow({ integration }: IntegrationRowProps) {
           </div>
           <div>
             <p className="text-muted-foreground mb-1">Handling</p>
-            <button className="text-primary hover:underline">Se feillogg →</button>
+            <button 
+              onClick={() => onViewErrorLog(integration.name)}
+              className="text-primary hover:underline"
+            >
+              Se feillogg →
+            </button>
           </div>
         </div>
       )}
@@ -159,7 +166,32 @@ function IntegrationRow({ integration }: IntegrationRowProps) {
 }
 
 export function IntegrationsTab() {
+  const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<"overview" | "errors">("overview");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    toast({
+      title: "Oppdaterer integrasjoner",
+      description: "Henter ny status fra alle tilkoblede systemer...",
+    });
+    setTimeout(() => {
+      setRefreshing(false);
+      toast({
+        title: "Oppdatering fullført",
+        description: "Alle integrasjoner er synkronisert.",
+      });
+    }, 2000);
+  };
+
+  const handleViewErrorLog = (integrationName: string) => {
+    setActiveSection("errors");
+    toast({
+      title: "Viser feillogg",
+      description: `Filtrert for ${integrationName}`,
+    });
+  };
 
   const stats = {
     ok: integrations.filter((i) => i.status === "ok").length,
@@ -204,9 +236,13 @@ export function IntegrationsTab() {
             {s.label}
           </button>
         ))}
-        <button className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-muted-foreground border border-border rounded-md text-sm hover:text-foreground transition-colors">
-          <RefreshCw className="w-3.5 h-3.5" />
-          Refresh
+        <button 
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-muted-foreground border border-border rounded-md text-sm hover:text-foreground transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={cn("w-3.5 h-3.5", refreshing && "animate-spin")} />
+          {refreshing ? "Oppdaterer..." : "Refresh"}
         </button>
       </div>
 
@@ -222,7 +258,7 @@ export function IntegrationsTab() {
             <span />
           </div>
           {integrations.map((integration) => (
-            <IntegrationRow key={integration.id} integration={integration} />
+            <IntegrationRow key={integration.id} integration={integration} onViewErrorLog={handleViewErrorLog} />
           ))}
         </div>
       )}

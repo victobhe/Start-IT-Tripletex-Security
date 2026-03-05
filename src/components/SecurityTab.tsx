@@ -3,6 +3,7 @@ import { Download, Shield, Users, Key, AlertTriangle, CheckCircle2, XCircle, Plu
 import { MetricCard } from "@/components/MetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const initialPolicies = [
+const initialPolicies: Array<{
+  id: number;
+  name: string;
+  status: "compliant" | "violation" | "partial";
+  coverage: number;
+  detail?: string;
+}> = [
   {
     id: 1,
     name: "2FA obligatorisk for alle admin-brukere",
@@ -91,15 +98,21 @@ const compliancePackItems = [
 ];
 
 export function SecurityTab() {
+  const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<"overview" | "policy" | "compliance">("overview");
   const [policies, setPolicies] = useState(initialPolicies);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [actionsDialogOpen, setActionsDialogOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<number | null>(null);
   const [actions, setActions] = useState(policyActions);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    status: "compliant" | "partial" | "violation";
+    coverage: number;
+    detail: string;
+  }>({
     name: "",
-    status: "compliant" as const,
+    status: "compliant",
     coverage: 100,
     detail: "",
   });
@@ -112,13 +125,13 @@ export function SecurityTab() {
       name: formData.name,
       status: formData.status,
       coverage: formData.status === "compliant" ? 100 : formData.coverage,
-      ...(formData.detail && { detail: formData.detail }),
-    };
+      ...(formData.detail && formData.status !== "compliant" && { detail: formData.detail }),
+    } as typeof initialPolicies[0];
 
     setPolicies([...policies, newPolicy]);
     setFormData({
       name: "",
-      status: "compliant" as const,
+      status: "compliant",
       coverage: 100,
       detail: "",
     });
@@ -139,6 +152,20 @@ export function SecurityTab() {
           : action
       ) || [],
     });
+  };
+
+  const handleDownloadCompliance = (format: string) => {
+    toast({
+      title: "Laster ned...",
+      description: `Compliance Pack Q1 2026 blir lastet ned som ${format}.`,
+    });
+    // Simulating download
+    setTimeout(() => {
+      toast({
+        title: "Nedlasting fullført",
+        description: `compliance-pack-q1-2026.${format.toLowerCase()} er klar.`,
+      });
+    }, 1500);
   };
 
   return (
@@ -273,7 +300,7 @@ export function SecurityTab() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="compliant">Overholdt</SelectItem>
+                        <SelectItem value="compliant" >Overholdt</SelectItem>
                         <SelectItem value="partial">Delvis</SelectItem>
                         <SelectItem value="violation">Avvik</SelectItem>
                       </SelectContent>
@@ -398,12 +425,15 @@ export function SecurityTab() {
 
             <div className="grid grid-cols-3 gap-2">
               {["PDF", "Excel", "ZIP"].map((fmt) => (
-                <button key={fmt} className={cn(
-                  "flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-all border",
-                  fmt === "PDF"
-                    ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                    : "bg-surface-2 text-foreground border-border hover:border-primary/30"
-                )}>
+                <button 
+                  key={fmt} 
+                  onClick={() => handleDownloadCompliance(fmt)}
+                  className={cn(
+                    "flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-all border",
+                    fmt === "PDF"
+                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                      : "bg-surface-2 text-foreground border-border hover:border-primary/30"
+                  )}>
                   <Download className="w-3.5 h-3.5" />
                   Last ned {fmt}
                 </button>

@@ -1,5 +1,6 @@
 import { ShieldCheck, Award, CheckCircle2, ExternalLink, BadgeCheck } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useToast } from "@/hooks/use-toast";
 
 const certifications = [
   {
@@ -98,6 +99,22 @@ const colorMap: Record<string, { bg: string; border: string; icon: string; tag: 
 };
 
 export function AboutTab() {
+  const { toast } = useToast();
+
+  const handleRequestReport = (certName: string) => {
+    toast({
+      title: "Forespørsel sendt",
+      description: `Din forespørsel om ${certName} er mottatt. Dokumentasjon sendes innen 24 timer.`,
+    });
+  };
+
+  const handleContact = () => {
+    toast({
+      title: "Åpner kontaktskjema",
+      description: "Du blir videresendt til compliance-teamet.",
+    });
+  };
+
   return (
     <div className="flex-1 overflow-auto scrollbar-thin p-6 space-y-8 animate-slide-in">
       {/* Hero */}
@@ -192,7 +209,10 @@ export function AboutTab() {
                   <span className={`text-[10px] px-2 py-0.5 rounded border font-medium ${col.tag}`}>
                     Uavhengig revisjon · {c.year}
                   </span>
-                  <button className="flex items-center gap-1 text-xs text-primary hover:underline">
+                  <button 
+                    onClick={() => handleRequestReport(c.title)}
+                    className="flex items-center gap-1 text-xs text-primary hover:underline"
+                  >
                     Be om rapport <ExternalLink className="w-3 h-3" />
                   </button>
                 </div>
@@ -214,7 +234,10 @@ export function AboutTab() {
             under NDA. Kontakt compliance-teamet for tilgang til fullstendige rapporter.
           </p>
         </div>
-        <button className="shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
+        <button 
+          onClick={handleContact}
+          className="shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+        >
           Kontakt oss
         </button>
       </div>
