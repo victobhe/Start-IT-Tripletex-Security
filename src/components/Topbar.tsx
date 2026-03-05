@@ -8,6 +8,7 @@ const tabLabels: Record<string, { label: string; description: string }> = {
   governance: { label: "Governance", description: "Godkjenning, delegering og audit trail" },
   integrations: { label: "Integrasjoner", description: "Systemstatus, feillogg og ansvar" },
   security: { label: "Security & Compliance", description: "Policy-håndheving og revisjonseksport" },
+  about: { label: "Om oss", description: "Sikkerhetstiltak, sertifiseringer og attestasjoner" },
 };
 
 export function Topbar({ activeTab }: TopbarProps) {

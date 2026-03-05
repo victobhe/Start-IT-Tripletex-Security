@@ -1,4 +1,4 @@
-import { Shield, Network, Lock } from "lucide-react";
+import { Shield, Network, Lock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -24,6 +24,12 @@ const tabs = [
     label: "Security & Compliance",
     icon: Lock,
     description: "Policy & bevis",
+  },
+  {
+    id: "about",
+    label: "Om oss",
+    icon: Info,
+    description: "Sertifiseringer & tiltak",
   },
 ];
 

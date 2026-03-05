@@ -4,8 +4,9 @@ import { Topbar } from "@/components/Topbar";
 import { GovernanceTab } from "@/components/GovernanceTab";
 import { IntegrationsTab } from "@/components/IntegrationsTab";
 import { SecurityTab } from "@/components/SecurityTab";
+import { AboutTab } from "@/components/AboutTab";
 
-type Tab = "governance" | "integrations" | "security";
+type Tab = "governance" | "integrations" | "security" | "about";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("governance");
@@ -19,6 +20,7 @@ const Index = () => {
           {activeTab === "governance" && <GovernanceTab />}
           {activeTab === "integrations" && <IntegrationsTab />}
           {activeTab === "security" && <SecurityTab />}
+          {activeTab === "about" && <AboutTab />}
         </main>
       </div>
     </div>
