@@ -1,4 +1,4 @@
-import { Shield, Network, Lock } from "lucide-react";
+import { Shield, Network, Lock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
